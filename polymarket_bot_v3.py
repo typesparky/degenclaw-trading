@@ -60,9 +60,12 @@ def safe_price(p: float, bid_depth: float = 0, ask_depth: float = 0, capture_reb
         capture_rebate: Whether to target rebate-eligible spreads.
     
     Logic:
-        Empty book (depth=0): We are the only MM. Wide spreads.
-        Thin book (depth < 100): Some competition. Moderate spreads.
-        Deep book (depth >= 1000): Liquid. Tight spreads for rebates.
+        Empty book (depth=0): We are the only MM. Wide spreads (12-17¢).
+        Thin book (depth < 100): Some competition. Moderate spreads (8-13¢).
+        Deep book (depth >= 500): Liquid. Tighter spreads (5-9.5¢).
+        
+        Minimum spread floor: 5 cents -- never quote tighter than this.
+        Moonshot premium: extra 2-5 cents for low-prob outcomes.
     """
     total_depth = bid_depth + ask_depth
 
@@ -74,15 +77,11 @@ def safe_price(p: float, bid_depth: float = 0, ask_depth: float = 0, capture_reb
         base_spread = 0.08
     elif total_depth < 500:
         base_spread = 0.06
-    elif total_depth < 1000:
-        base_spread = 0.045
     else:
-        base_spread = 0.015
+        base_spread = 0.05  # Floor: never tighter than 5 cents
 
     if capture_rebate:
         max_spread = 0.045
-        if total_depth >= 1000:
-            max_spread = 0.015
         base_spread = min(base_spread, max_spread)
 
     # Moonshot premium: low-prob outcomes are overpriced on PM
