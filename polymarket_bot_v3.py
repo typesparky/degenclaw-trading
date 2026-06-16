@@ -49,49 +49,66 @@ except ImportError:
 # PRICING ENGINE
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def safe_price(p: float, volume: float = 50000, capture_rebate: bool = True) -> Tuple[float, float]:
-    # Volume adjustment
-    if volume > 500000:
-        vol_factor = 0.7
-    elif volume > 100000:
-        vol_factor = 0.85
-    elif volume > 50000:
-        vol_factor = 1.0
-    else:
-        vol_factor = 1.3
+def safe_price(p: float, bid_depth: float = 0, ask_depth: float = 0, capture_rebate: bool = True) -> Tuple[float, float]:
+    """
+    Dynamic pricing based on actual order book state -- no hardcoded thresholds.
     
-    # Target spread: 1.5¢ for liq rewards (high-vol), 4.5¢ for maker rebate, 10¢ otherwise
+    Args:
+        p: Fair probability (0-1)
+        bid_depth: Total bid depth on opposite side (shares). 0 = empty book.
+        ask_depth: Total ask depth on our side (shares). 0 = empty book.
+        capture_rebate: Whether to target rebate-eligible spreads.
+    
+    Logic:
+        Empty book (depth=0): We are the only MM. Wide spreads.
+        Thin book (depth < 100): Some competition. Moderate spreads.
+        Deep book (depth >= 1000): Liquid. Tight spreads for rebates.
+    """
+    total_depth = bid_depth + ask_depth
+
+    if total_depth == 0:
+        base_spread = 0.12
+    elif total_depth < 50:
+        base_spread = 0.10
+    elif total_depth < 200:
+        base_spread = 0.08
+    elif total_depth < 500:
+        base_spread = 0.06
+    elif total_depth < 1000:
+        base_spread = 0.045
+    else:
+        base_spread = 0.015
+
     if capture_rebate:
         max_spread = 0.045
-    else:
-        max_spread = 0.10
-    
-    if volume > 100000 and capture_rebate:
-        target_spread = 0.015  # Liquidity rewards threshold
-    else:
-        target_spread = max_spread
-    
-    if p >= 0.30:
-        half_spread = min(target_spread / 2, 0.05 * vol_factor)
+        if total_depth >= 1000:
+            max_spread = 0.015
+        base_spread = min(base_spread, max_spread)
+
+    # Moonshot premium: low-prob outcomes are overpriced on PM
+    if p < 0.05:
+        base_spread += 0.05
+    elif p < 0.10:
+        base_spread += 0.03
+    elif p < 0.15:
+        base_spread += 0.02
+
+    half_spread = base_spread / 2
+
+    if p >= 0.15:
         bid = max(0.01, p - half_spread)
         ask = min(0.99, p + half_spread)
-    elif p >= 0.15:
-        half_spread = min(target_spread / 2, 0.08 * vol_factor)
-        bid = max(0.01, p - half_spread)
-        ask = min(0.99, p + half_spread)
-    elif p >= 0.10:
-        # 10-15%: bid at 4-6% absolute
-        bid = max(0.04, 0.04 * vol_factor)
-        ask = min(p + target_spread / 2, p + 0.08 * vol_factor)
-    elif p >= 0.05:
-        # 5-10%: bid at 3-4% absolute
-        bid = max(0.03, 0.03 * vol_factor)
-        ask = min(p + target_spread / 2, p + 0.08 * vol_factor)
     else:
-        # <5%: bid at 2-3% absolute
-        bid = max(0.02, 0.02 * vol_factor)
-        ask = min(p + target_spread / 2, p + 0.10 * vol_factor)
-    
+        # Moonshot: bid at absolute floor, ask captures premium
+        if p >= 0.10:
+            bid_floor = 0.04
+        elif p >= 0.05:
+            bid_floor = 0.03
+        else:
+            bid_floor = 0.02
+        bid = bid_floor
+        ask = min(0.99, p + half_spread + 0.02)
+
     return round(bid, 4), round(ask, 4)
 
 
@@ -303,10 +320,15 @@ class PolymarketBot:
     def set_probs(self, p: Dict[str, float]):
         self.probs = p
 
-    def build_quotes(self):
+    def build_quotes(self, orderbooks: Dict[str, Dict] = None):
+        """Build quotes using actual order book depth for spread calculation."""
         self.quotes = {}
         for n, p in self.probs.items():
-            bid, ask = safe_price(p)
+            # Get order book depth if available
+            ob = (orderbooks or {}).get(n, {})
+            bid_depth = ob.get("bid_depth", 0)
+            ask_depth = ob.get("ask_depth", 0)
+            bid, ask = safe_price(p, bid_depth=bid_depth, ask_depth=ask_depth)
             sz = safe_size(p)
             self.quotes[n] = Quote(n, p, bid, ask, sz)
 
