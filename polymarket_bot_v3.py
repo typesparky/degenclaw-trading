@@ -4,6 +4,12 @@ Polymarket Real-Time Quoting Bot v3
 =====================================
 Safe wide quoting with real-time WebSocket monitoring.
 
+Strategy:
+  1. Place wide limit orders pre-match
+  2. Leave them alone during the match (don't update)
+  3. Cancel unfilled orders after market resolution
+  4. Repeat for next match
+
 Setup:
   pip install polymarket-client websockets requests
 
@@ -16,6 +22,7 @@ import asyncio
 import json
 import os
 import time
+from datetime import datetime
 from typing import Dict, List, Tuple
 
 import websockets
@@ -260,8 +267,6 @@ class Bot:
         print(f"\n[GOAL! {hs}-{aws} | {data.get('period','')} {data.get('elapsed','')}]")
         self.probs = recalc_probs(self.probs, hs, aws)
         self.build(); self.show()
-        if not self.dry_run:
-            await self.cancel_all(); await self.place()
 
     async def ws_sports(self):
         print("[SPORTS_WS] Connecting...")
@@ -302,10 +307,15 @@ class Bot:
         if self.dry_run:
             print("\n[DRY RUN] Done.")
             return
+        # Monitor live scores; cancel unfilled orders when match ends
         try:
-            await asyncio.gather(self.ws_sports())
+            await self.ws_sports()
         except KeyboardInterrupt:
+            pass
+        finally:
+            print("\n[POST-MATCH] Cleaning up unfilled orders...")
             await self.cancel_all()
+            self.pnl.print_summary()
 
 
 # ── MAIN ─────────────────────────────────────────────────────────────────────
