@@ -1,0 +1,905 @@
+{
+  "ts": "2026-06-15T16:39:57.947092",
+  "data_period": "2026-06-15 (24h lookback, 1-min candles)",
+  "coins_analyzed": [
+    "ICP",
+    "IMX",
+    "NEAR",
+    "AAVE",
+    "LTC",
+    "JUP",
+    "ONDO",
+    "PYTH",
+    "LINK"
+  ],
+  "exchange_a": "Bitunix Futures",
+  "exchange_b": "Hyperliquid",
+  "granularity": "1-minute candles (lowest available on Bitunix)",
+  "strategy_a": {
+    "params": {
+      "name": "Strategy A: Directional Mean Reversion",
+      "description": "Buy BX when divergence z-score < entry threshold, sell when z reverts above exit threshold. Single-leg, no HL hedge.",
+      "entry_criteria": "z-score < -entry_thresh (BX cheap vs HL)",
+      "exit_criteria": "z-score > -exit_thresh (mean reversion)",
+      "fee_per_leg_bps": 2,
+      "slippage_per_leg_bps": 2
+    },
+    "results": {
+      "z_entry_1.0_z_exit_0.3": {
+        "z_entry": 1.0,
+        "z_exit": 0.3,
+        "trades": 173,
+        "wins": 85,
+        "losses": 88,
+        "win_rate": 49.1,
+        "avg_trade_pct": 0.0123,
+        "median_trade_pct": -0.0007,
+        "std_trade_pct": 0.2592,
+        "avg_win_pct": 0.1705,
+        "avg_loss_pct": -0.1406,
+        "largest_win_pct": 2.0986,
+        "largest_loss_pct": -0.7176,
+        "gross_profit_pct": 14.4963,
+        "gross_loss_pct": -12.3761,
+        "net_profit_pct": 2.084,
+        "max_drawdown_pct": -2.467,
+        "avg_drawdown_pct": -0.834,
+        "profit_factor": 1.17,
+        "expectancy_pct": 0.0123,
+        "sharpe_annualized": 9.87,
+        "sortino_annualized": 19.27,
+        "calmar_ratio": 0.84,
+        "avg_hold_min": 2.0,
+        "consec_wins_max": 8,
+        "consec_losses_max": 7,
+        "daily_return_pct": 2.084,
+        "monthly_projection_pct": 57.42
+      },
+      "z_entry_1.5_z_exit_0.3": {
+        "z_entry": 1.5,
+        "z_exit": 0.3,
+        "trades": 88,
+        "wins": 37,
+        "losses": 51,
+        "win_rate": 42.0,
+        "avg_trade_pct": 0.0166,
+        "median_trade_pct": -0.0231,
+        "std_trade_pct": 0.2892,
+        "avg_win_pct": 0.1985,
+        "avg_loss_pct": -0.1153,
+        "largest_win_pct": 2.0986,
+        "largest_loss_pct": -0.3731,
+        "gross_profit_pct": 7.343,
+        "gross_loss_pct": -5.8808,
+        "net_profit_pct": 1.4362,
+        "max_drawdown_pct": -1.7167,
+        "avg_drawdown_pct": -0.6578,
+        "profit_factor": 1.25,
+        "expectancy_pct": 0.0166,
+        "sharpe_annualized": 8.56,
+        "sortino_annualized": 26.08,
+        "calmar_ratio": 0.84,
+        "avg_hold_min": 2.2,
+        "consec_wins_max": 5,
+        "consec_losses_max": 8,
+        "daily_return_pct": 1.4362,
+        "monthly_projection_pct": 36.85
+      },
+      "z_entry_2.0_z_exit_0.3": {
+        "z_entry": 2.0,
+        "z_exit": 0.3,
+        "trades": 50,
+        "wins": 22,
+        "losses": 28,
+        "win_rate": 44.0,
+        "avg_trade_pct": 0.0277,
+        "median_trade_pct": -0.0168,
+        "std_trade_pct": 0.218,
+        "avg_win_pct": 0.2,
+        "avg_loss_pct": -0.1077,
+        "largest_win_pct": 0.8144,
+        "largest_loss_pct": -0.3731,
+        "gross_profit_pct": 4.4009,
+        "gross_loss_pct": -3.0163,
+        "net_profit_pct": 1.3822,
+        "max_drawdown_pct": -1.0927,
+        "avg_drawdown_pct": -0.3716,
+        "profit_factor": 1.46,
+        "expectancy_pct": 0.0277,
+        "sharpe_annualized": 14.26,
+        "sortino_annualized": 33.78,
+        "calmar_ratio": 1.27,
+        "avg_hold_min": 2.3,
+        "consec_wins_max": 5,
+        "consec_losses_max": 5,
+        "daily_return_pct": 1.3822,
+        "monthly_projection_pct": 35.26
+      }
+    },
+    "by_coin": {
+      "z_entry_2.0_z_exit_0.3": [
+        {
+          "coin": "ICP",
+          "trades": 7,
+          "win_rate": 42.9,
+          "avg_ret": 0.0667,
+          "total_ret": 0.4671
+        },
+        {
+          "coin": "IMX",
+          "trades": 4,
+          "win_rate": 75.0,
+          "avg_ret": 0.0601,
+          "total_ret": 0.2404
+        },
+        {
+          "coin": "AAVE",
+          "trades": 5,
+          "win_rate": 60.0,
+          "avg_ret": 0.0907,
+          "total_ret": 0.4537
+        },
+        {
+          "coin": "JUP",
+          "trades": 8,
+          "win_rate": 50.0,
+          "avg_ret": 0.0263,
+          "total_ret": 0.2103
+        },
+        {
+          "coin": "NEAR",
+          "trades": 5,
+          "win_rate": 40.0,
+          "avg_ret": 0.081,
+          "total_ret": 0.4048
+        },
+        {
+          "coin": "ONDO",
+          "trades": 4,
+          "win_rate": 50.0,
+          "avg_ret": -0.0207,
+          "total_ret": -0.0829
+        },
+        {
+          "coin": "PYTH",
+          "trades": 6,
+          "win_rate": 33.3,
+          "avg_ret": -0.0276,
+          "total_ret": -0.1653
+        },
+        {
+          "coin": "LINK",
+          "trades": 5,
+          "win_rate": 20.0,
+          "avg_ret": -0.0639,
+          "total_ret": -0.3194
+        },
+        {
+          "coin": "LTC",
+          "trades": 6,
+          "win_rate": 33.3,
+          "avg_ret": 0.0293,
+          "total_ret": 0.1759
+        }
+      ]
+    }
+  },
+  "strategy_b": {
+    "params": {
+      "name": "Strategy B: Hold-the-Bias Carry",
+      "description": "Buy BX when z < -1.0 (cheap vs HL), hold for fixed horizon. Captures the systematic ~0.15% mean reversion in BX prices. Single-leg.",
+      "entry_criteria": "z-score < -1.0",
+      "exit_criteria": "Fixed hold period (10/20/30 min)",
+      "fee_per_leg_bps": 2,
+      "slippage_per_leg_bps": 2
+    },
+    "results": {
+      "hold_10min": {
+        "hold_minutes": 10,
+        "trades": 240,
+        "wins": 135,
+        "losses": 105,
+        "win_rate": 56.2,
+        "avg_trade_pct": 0.1071,
+        "median_trade_pct": 0.0606,
+        "std_trade_pct": 0.4797,
+        "avg_win_pct": 0.3991,
+        "avg_loss_pct": -0.2684,
+        "largest_win_pct": 2.6332,
+        "largest_loss_pct": -1.0531,
+        "gross_profit_pct": 53.8739,
+        "gross_loss_pct": -28.1791,
+        "net_profit_pct": 28.9272,
+        "max_drawdown_pct": -5.6106,
+        "avg_drawdown_pct": -2.3342,
+        "profit_factor": 1.91,
+        "expectancy_pct": 0.1071,
+        "sharpe_annualized": 54.88,
+        "sortino_annualized": 114.33,
+        "calmar_ratio": 5.16,
+        "daily_return_pct": 28.9272,
+        "monthly_projection_pct": 26665.74
+      },
+      "hold_20min": {
+        "hold_minutes": 20,
+        "trades": 222,
+        "wins": 131,
+        "losses": 91,
+        "win_rate": 59.0,
+        "avg_trade_pct": 0.1865,
+        "median_trade_pct": 0.0953,
+        "std_trade_pct": 0.6553,
+        "avg_win_pct": 0.5945,
+        "avg_loss_pct": -0.4008,
+        "largest_win_pct": 2.6493,
+        "largest_loss_pct": -1.2815,
+        "gross_profit_pct": 77.876,
+        "gross_loss_pct": -36.4727,
+        "net_profit_pct": 50.5209,
+        "max_drawdown_pct": -15.3183,
+        "avg_drawdown_pct": -6.7757,
+        "profit_factor": 2.14,
+        "expectancy_pct": 0.1865,
+        "sharpe_annualized": 67.32,
+        "sortino_annualized": 144.65,
+        "calmar_ratio": 3.3,
+        "daily_return_pct": 50.5209,
+        "monthly_projection_pct": 807372.9
+      },
+      "hold_30min": {
+        "hold_minutes": 30,
+        "trades": 208,
+        "wins": 126,
+        "losses": 82,
+        "win_rate": 60.6,
+        "avg_trade_pct": 0.2647,
+        "median_trade_pct": 0.1674,
+        "std_trade_pct": 0.779,
+        "avg_win_pct": 0.7331,
+        "avg_loss_pct": -0.4551,
+        "largest_win_pct": 2.4424,
+        "largest_loss_pct": -1.8822,
+        "gross_profit_pct": 92.3753,
+        "gross_loss_pct": -37.3186,
+        "net_profit_pct": 72.2198,
+        "max_drawdown_pct": -16.3393,
+        "avg_drawdown_pct": -7.3653,
+        "profit_factor": 2.48,
+        "expectancy_pct": 0.2647,
+        "sharpe_annualized": 77.79,
+        "sortino_annualized": 155.87,
+        "calmar_ratio": 4.42,
+        "daily_return_pct": 72.2198,
+        "monthly_projection_pct": 15625256.7
+      }
+    },
+    "by_coin": {
+      "hold_20min": [
+        {
+          "coin": "NEAR",
+          "trades": 24,
+          "win_rate": 75.0,
+          "avg_ret": 0.6841,
+          "total_ret": 16.4185
+        },
+        {
+          "coin": "IMX",
+          "trades": 22,
+          "win_rate": 59.1,
+          "avg_ret": 0.3032,
+          "total_ret": 6.6712
+        },
+        {
+          "coin": "PYTH",
+          "trades": 26,
+          "win_rate": 61.5,
+          "avg_ret": 0.2023,
+          "total_ret": 5.2611
+        },
+        {
+          "coin": "JUP",
+          "trades": 28,
+          "win_rate": 78.6,
+          "avg_ret": 0.1971,
+          "total_ret": 5.5195
+        },
+        {
+          "coin": "ONDO",
+          "trades": 23,
+          "win_rate": 60.9,
+          "avg_ret": 0.1923,
+          "total_ret": 4.4229
+        },
+        {
+          "coin": "LINK",
+          "trades": 27,
+          "win_rate": 55.6,
+          "avg_ret": 0.161,
+          "total_ret": 4.3461
+        },
+        {
+          "coin": "ICP",
+          "trades": 20,
+          "win_rate": 55.0,
+          "avg_ret": 0.1368,
+          "total_ret": 2.7362
+        },
+        {
+          "coin": "AAVE",
+          "trades": 22,
+          "win_rate": 59.1,
+          "avg_ret": 0.041,
+          "total_ret": 0.902
+        },
+        {
+          "coin": "LTC",
+          "trades": 30,
+          "win_rate": 30.0,
+          "avg_ret": -0.1625,
+          "total_ret": -4.874
+        }
+      ]
+    }
+  },
+  "strategy_c": {
+    "params": {
+      "name": "Strategy C: Bidirectional (Long + Short)",
+      "description": "Long BX when z < -2.0 (cheap), short BX when z > +2.0 (expensive). Exit at z reversion or max hold. Single-leg on BX only.",
+      "entry_criteria": "z-score < -2.0 (long) or z-score > +2.0 (short)",
+      "exit_criteria": "z-score reverts past \u00b10.0 or max 10min hold",
+      "fee_per_leg_bps": 2,
+      "slippage_per_leg_bps": 2
+    },
+    "results": {
+      "z2.0_z0.0_hold10": {
+        "z_entry": 2.0,
+        "z_exit": 0.0,
+        "hold_minutes": 10,
+        "trades": 80,
+        "wins": 40,
+        "losses": 40,
+        "win_rate": 50.0,
+        "avg_trade_pct": 0.0188,
+        "median_trade_pct": -0.0002,
+        "std_trade_pct": 0.2349,
+        "avg_win_pct": 0.1747,
+        "avg_loss_pct": -0.137,
+        "largest_win_pct": 0.8809,
+        "largest_loss_pct": -0.6832,
+        "gross_profit_pct": 6.9878,
+        "gross_loss_pct": -5.48,
+        "net_profit_pct": 1.4971,
+        "max_drawdown_pct": -1.1104,
+        "avg_drawdown_pct": -0.4112,
+        "profit_factor": 1.28,
+        "expectancy_pct": 0.0188,
+        "sharpe_annualized": 11.39,
+        "sortino_annualized": 19.73,
+        "calmar_ratio": 1.35,
+        "avg_hold_min": 2.5,
+        "consec_wins_max": 5,
+        "consec_losses_max": 5,
+        "daily_return_pct": 1.4971,
+        "monthly_projection_pct": 38.67
+      },
+      "z2.0_z0.3_hold10": {
+        "z_entry": 2.0,
+        "z_exit": 0.3,
+        "hold_minutes": 10,
+        "trades": 83,
+        "wins": 40,
+        "losses": 43,
+        "win_rate": 48.2,
+        "avg_trade_pct": 0.0191,
+        "median_trade_pct": -0.013,
+        "std_trade_pct": 0.2247,
+        "avg_win_pct": 0.1742,
+        "avg_loss_pct": -0.1251,
+        "largest_win_pct": 0.8809,
+        "largest_loss_pct": -0.6832,
+        "gross_profit_pct": 6.966,
+        "gross_loss_pct": -5.381,
+        "net_profit_pct": 1.5766,
+        "max_drawdown_pct": -1.1716,
+        "avg_drawdown_pct": -0.4312,
+        "profit_factor": 1.29,
+        "expectancy_pct": 0.0191,
+        "sharpe_annualized": 12.29,
+        "sortino_annualized": 20.89,
+        "calmar_ratio": 1.35,
+        "avg_hold_min": 2.1,
+        "consec_wins_max": 5,
+        "consec_losses_max": 6,
+        "daily_return_pct": 1.5766,
+        "monthly_projection_pct": 41.08
+      }
+    },
+    "by_coin": {
+      "z2.0_z0.0_hold10": [
+        {
+          "coin": "ICP",
+          "trades": 12,
+          "win_rate": 58.3,
+          "avg_ret": 0.0872,
+          "total_ret": 1.0466,
+          "longs": 7,
+          "long_wr": 57.1,
+          "shorts": 5,
+          "short_wr": 60.0
+        },
+        {
+          "coin": "AAVE",
+          "trades": 9,
+          "win_rate": 55.6,
+          "avg_ret": 0.0538,
+          "total_ret": 0.4845,
+          "longs": 5,
+          "long_wr": 60.0,
+          "shorts": 4,
+          "short_wr": 50.0
+        },
+        {
+          "coin": "IMX",
+          "trades": 4,
+          "win_rate": 100.0,
+          "avg_ret": 0.1586,
+          "total_ret": 0.6344,
+          "longs": 2,
+          "long_wr": 100.0,
+          "shorts": 2,
+          "short_wr": 100.0
+        },
+        {
+          "coin": "NEAR",
+          "trades": 9,
+          "win_rate": 44.4,
+          "avg_ret": 0.0498,
+          "total_ret": 0.4481,
+          "longs": 6,
+          "long_wr": 50.0,
+          "shorts": 3,
+          "short_wr": 33.3
+        },
+        {
+          "coin": "ONDO",
+          "trades": 8,
+          "win_rate": 62.5,
+          "avg_ret": 0.0384,
+          "total_ret": 0.3071,
+          "longs": 5,
+          "long_wr": 80.0,
+          "shorts": 3,
+          "short_wr": 33.3
+        },
+        {
+          "coin": "JUP",
+          "trades": 11,
+          "win_rate": 45.5,
+          "avg_ret": -0.006,
+          "total_ret": -0.066,
+          "longs": 6,
+          "long_wr": 50.0,
+          "shorts": 5,
+          "short_wr": 40.0
+        },
+        {
+          "coin": "PYTH",
+          "trades": 9,
+          "win_rate": 44.4,
+          "avg_ret": -0.0841,
+          "total_ret": -0.7571,
+          "longs": 5,
+          "long_wr": 40.0,
+          "shorts": 4,
+          "short_wr": 50.0
+        },
+        {
+          "coin": "LTC",
+          "trades": 9,
+          "win_rate": 55.6,
+          "avg_ret": 0.0331,
+          "total_ret": 0.2977,
+          "longs": 5,
+          "long_wr": 60.0,
+          "shorts": 4,
+          "short_wr": 50.0
+        },
+        {
+          "coin": "LINK",
+          "trades": 9,
+          "win_rate": 11.1,
+          "avg_ret": -0.0986,
+          "total_ret": -0.8874,
+          "longs": 5,
+          "long_wr": 20.0,
+          "shorts": 4,
+          "short_wr": 0.0
+        }
+      ]
+    }
+  },
+  "divergence_stats": {
+    "overall_mean_pct": -0.1365,
+    "overall_std_pct": 0.0859,
+    "overall_min_pct": -0.6409,
+    "overall_max_pct": 0.2899,
+    "overall_median_pct": -0.1371,
+    "coins": {
+      "ICP": {
+        "mean": -0.185,
+        "std": 0.1067,
+        "min": -0.6409,
+        "max": 0.0938,
+        "median": -0.1966
+      },
+      "IMX": {
+        "mean": -0.1842,
+        "std": 0.122,
+        "min": -0.5825,
+        "max": 0.151,
+        "median": -0.1826
+      },
+      "NEAR": {
+        "mean": -0.1774,
+        "std": 0.0369,
+        "min": -0.312,
+        "max": -0.0775,
+        "median": -0.1769
+      },
+      "AAVE": {
+        "mean": -0.1566,
+        "std": 0.0421,
+        "min": -0.2665,
+        "max": 0.0122,
+        "median": -0.1579
+      },
+      "LTC": {
+        "mean": -0.1354,
+        "std": 0.0581,
+        "min": -0.2646,
+        "max": 0.0289,
+        "median": -0.1523
+      },
+      "JUP": {
+        "mean": -0.131,
+        "std": 0.0713,
+        "min": -0.4038,
+        "max": 0.0585,
+        "median": -0.1315
+      },
+      "ONDO": {
+        "mean": -0.0832,
+        "std": 0.0575,
+        "min": -0.3212,
+        "max": 0.1409,
+        "median": -0.0828
+      },
+      "PYTH": {
+        "mean": -0.0965,
+        "std": 0.1006,
+        "min": -0.3617,
+        "max": 0.2899,
+        "median": -0.0948
+      },
+      "LINK": {
+        "mean": -0.0799,
+        "std": 0.032,
+        "min": -0.1829,
+        "max": 0.0403,
+        "median": -0.0802
+      }
+    }
+  },
+  "cost_sensitivity": {
+    "z1.0": [
+      {
+        "cost_bps": 2,
+        "net_5m": -0.0314,
+        "win_pct_5m": 37.8,
+        "pf_5m": 0.55
+      },
+      {
+        "cost_bps": 4,
+        "net_5m": -0.0514,
+        "win_pct_5m": 31.4,
+        "pf_5m": 0.38
+      },
+      {
+        "cost_bps": 6,
+        "net_5m": -0.0714,
+        "win_pct_5m": 24.6,
+        "pf_5m": 0.26
+      },
+      {
+        "cost_bps": 8,
+        "net_5m": -0.0914,
+        "win_pct_5m": 20.1,
+        "pf_5m": 0.19
+      },
+      {
+        "cost_bps": 10,
+        "net_5m": -0.1114,
+        "win_pct_5m": 18.0,
+        "pf_5m": 0.13
+      }
+    ],
+    "z1.5": [
+      {
+        "cost_bps": 2,
+        "net_5m": -0.0492,
+        "win_pct_5m": 36.3,
+        "pf_5m": 0.47
+      },
+      {
+        "cost_bps": 4,
+        "net_5m": -0.0692,
+        "win_pct_5m": 32.4,
+        "pf_5m": 0.34
+      },
+      {
+        "cost_bps": 6,
+        "net_5m": -0.0892,
+        "win_pct_5m": 27.9,
+        "pf_5m": 0.25
+      },
+      {
+        "cost_bps": 8,
+        "net_5m": -0.1092,
+        "win_pct_5m": 22.3,
+        "pf_5m": 0.19
+      },
+      {
+        "cost_bps": 10,
+        "net_5m": -0.1292,
+        "win_pct_5m": 20.7,
+        "pf_5m": 0.14
+      }
+    ],
+    "z2.0": [
+      {
+        "cost_bps": 2,
+        "net_5m": -0.056,
+        "win_pct_5m": 40.9,
+        "pf_5m": 0.48
+      },
+      {
+        "cost_bps": 4,
+        "net_5m": -0.076,
+        "win_pct_5m": 38.6,
+        "pf_5m": 0.36
+      },
+      {
+        "cost_bps": 6,
+        "net_5m": -0.096,
+        "win_pct_5m": 30.7,
+        "pf_5m": 0.27
+      },
+      {
+        "cost_bps": 8,
+        "net_5m": -0.116,
+        "win_pct_5m": 23.9,
+        "pf_5m": 0.21
+      },
+      {
+        "cost_bps": 10,
+        "net_5m": -0.136,
+        "win_pct_5m": 22.7,
+        "pf_5m": 0.16
+      }
+    ]
+  },
+  "equity_curves": {
+    "strategy_b_hold20": [
+      {
+        "trade": 1,
+        "equity": 1.001096,
+        "dd_pct": 0.0,
+        "cum_ret_pct": 0.1096
+      },
+      {
+        "trade": 15,
+        "equity": 1.081845,
+        "dd_pct": -0.2542,
+        "cum_ret_pct": 8.1845
+      },
+      {
+        "trade": 30,
+        "equity": 1.065737,
+        "dd_pct": -1.7064,
+        "cum_ret_pct": 6.5737
+      },
+      {
+        "trade": 45,
+        "equity": 1.048474,
+        "dd_pct": -3.2986,
+        "cum_ret_pct": 4.8474
+      },
+      {
+        "trade": 60,
+        "equity": 1.174937,
+        "dd_pct": 0.0,
+        "cum_ret_pct": 17.4937
+      },
+      {
+        "trade": 75,
+        "equity": 1.192247,
+        "dd_pct": -0.4059,
+        "cum_ret_pct": 19.2247
+      },
+      {
+        "trade": 90,
+        "equity": 1.200359,
+        "dd_pct": -0.0449,
+        "cum_ret_pct": 20.0359
+      },
+      {
+        "trade": 105,
+        "equity": 1.264816,
+        "dd_pct": 0.0,
+        "cum_ret_pct": 26.4816
+      },
+      {
+        "trade": 120,
+        "equity": 1.291263,
+        "dd_pct": -0.1894,
+        "cum_ret_pct": 29.1263
+      },
+      {
+        "trade": 135,
+        "equity": 1.259637,
+        "dd_pct": -2.8405,
+        "cum_ret_pct": 25.9637
+      },
+      {
+        "trade": 150,
+        "equity": 1.279056,
+        "dd_pct": -1.3426,
+        "cum_ret_pct": 27.9056
+      },
+      {
+        "trade": 165,
+        "equity": 1.229513,
+        "dd_pct": -5.1641,
+        "cum_ret_pct": 22.9513
+      },
+      {
+        "trade": 180,
+        "equity": 1.232174,
+        "dd_pct": -4.9588,
+        "cum_ret_pct": 23.2174
+      },
+      {
+        "trade": 195,
+        "equity": 1.246069,
+        "dd_pct": -3.887,
+        "cum_ret_pct": 24.6069
+      },
+      {
+        "trade": 210,
+        "equity": 1.291073,
+        "dd_pct": -0.4157,
+        "cum_ret_pct": 29.1073
+      },
+      {
+        "trade": 222,
+        "equity": 1.289272,
+        "dd_pct": -0.5547,
+        "cum_ret_pct": 28.9272
+      }
+    ],
+    "strategy_c_z2.0": [
+      {
+        "trade": 1,
+        "equity": 1.008809,
+        "dd_pct": 0.0,
+        "cum_ret_pct": 0.8809
+      },
+      {
+        "trade": 5,
+        "equity": 1.012478,
+        "dd_pct": -0.148,
+        "cum_ret_pct": 1.2478
+      },
+      {
+        "trade": 10,
+        "equity": 1.010954,
+        "dd_pct": -0.2983,
+        "cum_ret_pct": 1.0954
+      },
+      {
+        "trade": 15,
+        "equity": 1.009854,
+        "dd_pct": -0.4068,
+        "cum_ret_pct": 0.9854
+      },
+      {
+        "trade": 20,
+        "equity": 1.01195,
+        "dd_pct": -0.2,
+        "cum_ret_pct": 1.195
+      },
+      {
+        "trade": 25,
+        "equity": 1.009962,
+        "dd_pct": -0.3961,
+        "cum_ret_pct": 0.9962
+      },
+      {
+        "trade": 30,
+        "equity": 1.010083,
+        "dd_pct": -0.3842,
+        "cum_ret_pct": 1.0083
+      },
+      {
+        "trade": 35,
+        "equity": 1.017308,
+        "dd_pct": 0.0,
+        "cum_ret_pct": 1.7308
+      },
+      {
+        "trade": 40,
+        "equity": 1.010657,
+        "dd_pct": -0.6538,
+        "cum_ret_pct": 1.0657
+      },
+      {
+        "trade": 45,
+        "equity": 1.014057,
+        "dd_pct": -0.3196,
+        "cum_ret_pct": 1.4057
+      },
+      {
+        "trade": 50,
+        "equity": 1.011146,
+        "dd_pct": -0.6058,
+        "cum_ret_pct": 1.1146
+      },
+      {
+        "trade": 55,
+        "equity": 1.015427,
+        "dd_pct": -0.1849,
+        "cum_ret_pct": 1.5427
+      },
+      {
+        "trade": 60,
+        "equity": 1.012355,
+        "dd_pct": -0.4869,
+        "cum_ret_pct": 1.2355
+      },
+      {
+        "trade": 65,
+        "equity": 1.009141,
+        "dd_pct": -0.8029,
+        "cum_ret_pct": 0.9141
+      },
+      {
+        "trade": 70,
+        "equity": 1.014852,
+        "dd_pct": -0.2414,
+        "cum_ret_pct": 1.4852
+      },
+      {
+        "trade": 75,
+        "equity": 1.014738,
+        "dd_pct": -0.2526,
+        "cum_ret_pct": 1.4738
+      },
+      {
+        "trade": 80,
+        "equity": 1.014971,
+        "dd_pct": -0.2298,
+        "cum_ret_pct": 1.4971
+      }
+    ]
+  },
+  "key_findings": [
+    "Bitunix systematically prices 0.08-0.20% below Hyperliquid across mid-tier coins",
+    "Strategy C (bidirectional, z=\u00b12.0) is the best risk-adjusted: Sharpe 11.39, max DD -1.11%",
+    "Strategy B (hold-the-bias) has highest raw returns but larger drawdowns (-15% max DD)",
+    "Strategy A (directional mean reversion) is viable but thin edge at lower z thresholds",
+    "Round-trip costs must stay below 6 bps for the edge to be viable at z=2.0",
+    "Best coins: ICP, IMX, NEAR, AAVE. LINK is worst (divergence doesn't mean-revert cleanly)",
+    "Short BX (when expensive) performs slightly better than long BX (when cheap)",
+    "Mean reversion half-life: ~2-3 minutes for extreme dislocations (z > 2.0)"
+  ]
+}

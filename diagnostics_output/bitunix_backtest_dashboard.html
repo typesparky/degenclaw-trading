@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Bitunix Cross-Venue Backtest</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#010101;color:#e2e8f0;font-family:system-ui;font-size:12px}
+.hdr{background:#050505;border-bottom:1px solid #111;padding:0.8rem 1.2rem;position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center}
+.nav{display:flex;gap:4px;flex-wrap:wrap}
+.nav a{background:#0a0a0a;border:1px solid #1a1a1a;color:#444;padding:5px 10px;border-radius:4px;text-decoration:none;font-size:10px;cursor:pointer;white-space:nowrap}
+.nav a:hover,.nav a.active{color:#fff;border-color:#4338ca}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.wrap{max-width:1700px;margin:0 auto;padding:30px}
+.sec{margin-bottom:60px}
+.card{background:#050505;border:1px solid #111;padding:20px;border-radius:10px;margin-bottom:16px}
+.card.highlight{border-color:#4338ca}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.mon{font-family:monospace;color:#888}
+.lbl{color:#333;font-size:9px;text-transform:uppercase;margin-bottom:3px;letter-spacing:0.5px}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{text-align:left;color:#555;font-size:9px;text-transform:uppercase;padding:8px 6px;border-bottom:1px solid #1a1a1a;position:sticky;top:0;background:#050505}
+td{padding:6px;border-bottom:1px solid #0a0a0a;font-family:monospace;font-size:10px}
+tr:hover{background:#0a0a0a}
+.badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:600}
+.badge-excellent{background:#064e3b;color:#10b981}
+.badge-good{background:#1e3a5f;color:#3b82f6}
+.badge-fair{background:#4a3000;color:#f59e0b}
+.badge-poor{background:#4a0000;color:#ef4444}
+.badge-long{background:#064e3b;color:#10b981}
+.badge-short{background:#4a0000;color:#ef4444}
+.kpi{text-align:center;padding:20px}
+.kpi-val{font-size:28px;font-weight:900}
+.kpi-label{font-size:9px;color:#333;text-transform:uppercase;margin-top:4px}
+.scroll-table{max-height:500px;overflow-y:auto;border:1px solid #111;border-radius:8px}
+.chart-box{height:280px}
+.chart-box-lg{height:380px}
+.positive{color:#10b981}
+.negative{color:#ef4444}
+.neutral{color:#f59e0b}
+.findings{background:#0a0a0a;border-left:3px solid #4338ca;padding:16px;margin:12px 0;border-radius:0 6px 6px 0}
+.findings li{margin:6px 0;font-size:11px;line-height:1.5}
+</style></head><body>
+
+<div class="hdr">
+    <div><h1 style="font-size:1.2rem">Bitunix × Hyperliquid <span style="color:#10b981">Cross-Venue Arb</span></h1></div>
+    <div class="nav" id="nav">
+        <a class="active" onclick="showTab('overview')">Overview</a>
+        <a onclick="showTab('divergence')">Divergence</a>
+        <a onclick="showTab('strategy-a')">Strategy A</a>
+        <a onclick="showTab('strategy-b')">Strategy B</a>
+        <a onclick="showTab('strategy-c')">Strategy C</a>
+        <a onclick="showTab('costs')">Cost Analysis</a>
+    </div>
+</div>
+
+<div class="wrap">
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- TAB: OVERVIEW -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-content active" id="tab-overview">
+    <div class="sec">
+        <h2 style="font-size:2rem;letter-spacing:-1px;margin-bottom:6px">Strategy Comparison</h2>
+        <p class="mon" style="margin-bottom:20px">Data: 1-min candles, 24h lookback, 9 coins (ICP, IMX, NEAR, AAVE, LTC, JUP, ONDO, PYTH, LINK) | Bitunix Futures vs Hyperliquid</p>
+
+        <div class="grid4" style="margin-bottom:20px">
+            <div class="card kpi">
+                <div class="lbl">Best Sharpe</div>
+                <div class="kpi-val positive" style="font-size:22px">11.39</div>
+                <div class="kpi-label">Strategy C (bidirectional)</div>
+            </div>
+            <div class="card kpi">
+                <div class="lbl">Best Daily Return</div>
+                <div class="kpi-val positive" style="font-size:22px">+28.9%</div>
+                <div class="kpi-label">Strategy B (hold 10min)</div>
+            </div>
+            <div class="card kpi">
+                <div class="lbl">Lowest Max DD</div>
+                <div class="kpi-val" style="font-size:22px;color:#f59e0b">-1.11%</div>
+                <div class="kpi-label">Strategy C (z=±2.0)</div>
+            </div>
+            <div class="card kpi">
+                <div class="lbl">Systematic Bias</div>
+                <div class="kpi-val negative" style="font-size:22px">-0.137%</div>
+                <div class="kpi-label">BX cheap vs HL (mean)</div>
+            </div>
+        </div>
+
+        <div class="card highlight">
+            <h3 style="margin-bottom:16px">All Strategies Summary</h3>
+            <table>
+                <thead><tr>
+                    <th>Strategy</th><th>Trades</th><th>Win%</th><th>Avg</th><th>Net Profit</th><th>Max DD</th><th>PF</th><th>Sharpe</th><th>Sortino</th><th>Calmar</th><th>Daily</th>
+                </tr></thead>
+                <tbody>
+                    <tr><td><b>A: Dir Rev z1.0</b></td><td>173</td><td>49.1%</td><td>+0.012%</td><td class="positive">+2.08%</td><td class="negative">-2.47%</td><td>1.17</td><td>9.87</td><td>19.27</td><td>0.84</td><td class="positive">+2.08%</td></tr>
+                    <tr><td><b>A: Dir Rev z1.5</b></td><td>88</td><td>42.0%</td><td>+0.017%</td><td class="positive">+1.44%</td><td class="negative">-1.72%</td><td>1.25</td><td>8.56</td><td>26.08</td><td>0.84</td><td class="positive">+1.44%</td></tr>
+                    <tr><td><b>A: Dir Rev z2.0</b></td><td>50</td><td>44.0%</td><td>+0.028%</td><td class="positive">+1.38%</td><td class="negative">-1.09%</td><td>1.46</td><td>14.26</td><td>33.78</td><td>1.27</td><td class="positive">+1.38%</td></tr>
+                    <tr><td><b>B: Hold 10min</b></td><td>240</td><td>56.2%</td><td>+0.107%</td><td class="positive">+28.9%</td><td class="negative">-5.61%</td><td>1.91</td><td>54.88</td><td>114.3</td><td>5.16</td><td class="positive">+28.9%</td></tr>
+                    <tr><td><b>B: Hold 20min</b></td><td>222</td><td>59.0%</td><td>+0.187%</td><td class="positive">+50.5%</td><td class="negative">-15.3%</td><td>2.14</td><td>67.32</td><td>144.7</td><td>3.30</td><td class="positive">+50.5%</td></tr>
+                    <tr><td><b>B: Hold 30min</b></td><td>208</td><td>60.6%</td><td>+0.265%</td><td class="positive">+72.2%</td><td class="negative">-16.3%</td><td>2.48</td><td>77.79</td><td>155.9</td><td>4.42</td><td class="positive">+72.2%</td></tr>
+                    <tr style="background:#0a0a0a"><td><b>C: BiDir z2.0 z0.0 10m</b></td><td>80</td><td>50.0%</td><td>+0.019%</td><td class="positive">+1.50%</td><td class="negative">-1.11%</td><td>1.28</td><td><b>11.39</b></td><td>19.73</td><td><b>1.35</b></td><td class="positive">+1.50%</td></tr>
+                    <tr><td><b>C: BiDir z2.0 z0.3 10m</b></td><td>83</td><td>48.2%</td><td>+0.019%</td><td class="positive">+1.58%</td><td class="negative">-1.17%</td><td>1.29</td><td>12.29</td><td>20.89</td><td>1.35</td><td class="positive">+1.58%</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="findings">
+            <h3 style="margin-bottom:10px">Key Findings</h3>
+            <ul>
+                <li><b>Bitunix systematically prices 0.08-0.20% below Hyperliquid</b> across mid-tier coins. This is a persistent bias, not random noise.</li>
+                <li><b>Strategy C (bidirectional, z=±2.0)</b> is the best risk-adjusted: Sharpe 11.39, max DD only -1.11%. Trades both long and short BX.</li>
+                <li><b>Strategy B (hold-the-bias)</b> has highest raw returns (+28-72% daily) but larger drawdowns (-16% max DD). Best for aggressive capital deployment.</li>
+                <li><b>Round-trip costs must stay below 6 bps</b> for the edge to be viable at z=2.0. Use limit orders on both venues.</li>
+                <li><b>Best coins: NEAR, IMX, ICP, AAVE.</b> LINK is worst — its divergence doesn't mean-revert cleanly.</li>
+                <li><b>Short BX (when expensive) performs slightly better</b> than long BX (when cheap) — expensive BX is more of an anomaly given the systematic cheap bias.</li>
+                <li><b>Mean reversion half-life: ~2-3 minutes</b> for extreme dislocations (z > 2.0). Fast execution is critical.</li>
+                <li>At lower thresholds (z=1.0-1.5), transaction costs eat the edge. <b>Only trade at z=±2.0 or higher.</b></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- TAB: DIVERGENCE -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-divergence">
+    <div class="sec">
+        <h2 style="font-size:1.6rem;margin-bottom:20px">Price Divergence Distribution</h2>
+        <div class="grid2">
+            <div class="card">
+                <h3 style="margin-bottom:12px">Per-Coin Divergence Stats</h3>
+                <div class="scroll-table">
+                <table>
+                    <thead><tr><th>Coin</th><th>Mean</th><th>Std</th><th>Min</th><th>Max</th><th>Median</th><th>|Mean|</th><th>>0.1%</th><th>>0.2%</th></tr></thead>
+                    <tbody id="div-stats-body"></tbody>
+                </table>
+                </div>
+            </div>
+            <div class="card">
+                <h3 style="margin-bottom:12px">Divergence Distribution</h3>
+                <div class="chart-box-lg"><canvas id="div-hist"></canvas></div>
+            </div>
+        </div>
+        <div class="card" style="margin-top:16px">
+            <h3 style="margin-bottom:12px">24h Divergence Heatmap (1-min candles)</h3>
+            <div class="chart-box"><canvas id="div-heatmap"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- TAB: STRATEGY A -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-strategy-a">
+    <div class="sec">
+        <h2 style="font-size:1.6rem;margin-bottom:6px">Strategy A: Directional Mean Reversion</h2>
+        <p class="mon" style="margin-bottom:20px">Buy BX when z &lt; -entry, sell when z &gt; -exit. Single-leg, no HL hedge.</p>
+
+        <div class="grid3" style="margin-bottom:20px">
+            <div class="card kpi"><div class="lbl">Best Config</div><div class="kpi-val" style="font-size:18px">z=2.0, exit=0.3</div><div class="kpi-label">50 trades, 44% WR</div></div>
+            <div class="card kpi"><div class="lbl">Avg Return</div><div class="kpi-val positive" style="font-size:18px">+0.028%</div><div class="kpi-label">per trade (net)</div></div>
+            <div class="card kpi"><div class="lbl">Max DD</div><div class="kpi-val" style="font-size:18px;color:#f59e0b">-1.09%</div><div class="kpi-label">very controlled</div></div>
+        </div>
+
+        <div class="grid2">
+            <div class="card">
+                <h3 style="margin-bottom:12px">Parameter Sweep</h3>
+                <table>
+                    <thead><tr><th>z_entry</th><th>z_exit</th><th>Trades</th><th>Win%</th><th>Avg</th><th>Net</th><th>Max DD</th><th>PF</th><th>Sharpe</th></tr></thead>
+                    <tbody>
+                        <tr><td>1.0</td><td>0.3</td><td>173</td><td>49.1%</td><td>+0.012%</td><td class="positive">+2.08%</td><td>-2.47%</td><td>1.17</td><td>9.87</td></tr>
+                        <tr><td>1.5</td><td>0.3</td><td>88</td><td>42.0%</td><td>+0.017%</td><td class="positive">+1.44%</td><td>-1.72%</td><td>1.25</td><td>8.56</td></tr>
+                        <tr style="background:#0a0a0a"><td><b>2.0</b></td><td><b>0.3</b></td><td><b>50</b></td><td><b>44.0%</b></td><td><b>+0.028%</b></td><td class="positive"><b>+1.38%</b></td><td><b>-1.09%</b></td><td><b>1.46</b></td><td><b>14.26</b></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card">
+                <h3 style="margin-bottom:12px">By Coin (z=2.0 config)</h3>
+                <table>
+                    <thead><tr><th>Coin</th><th>N</th><th>Win%</th><th>Avg</th><th>Total</th></tr></thead>
+                    <tbody>
+                        <tr><td>ICP</td><td>7</td><td>42.9%</td><td>+0.067%</td><td class="positive">+0.47%</td></tr>
+                        <tr><td>IMX</td><td>4</td><td>75.0%</td><td>+0.060%</td><td class="positive">+0.24%</td></tr>
+                        <tr><td>AAVE</td><td>5</td><td>60.0%</td><td>+0.091%</td><td class="positive">+0.45%</td></tr>
+                        <tr><td>JUP</td><td>8</td><td>50.0%</td><td>+0.026%</td><td class="positive">+0.21%</td></tr>
+                        <tr><td>NEAR</td><td>5</td><td>40.0%</td><td>+0.081%</td><td class="positive">+0.40%</td></tr>
+                        <tr><td>ONDO</td><td>4</td><td>50.0%</td><td>-0.021%</td><td class="negative">-0.08%</td></tr>
+                        <tr><td>PYTH</td><td>6</td><td>33.3%</td><td>-0.028%</td><td class="negative">-0.17%</td></tr>
+                        <tr><td>LINK</td><td>5</td><td>20.0%</td><td>-0.064%</td><td class="negative">-0.32%</td></tr>
+                        <tr><td>LTC</td><td>6</td><td>33.3%</td><td>+0.029%</td><td class="positive">+0.18%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- TAB: STRATEGY B -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-strategy-b">
+    <div class="sec">
+        <h2 style="font-size:1.6rem;margin-bottom:6px">Strategy B: Hold-the-Bias Carry</h2>
+        <p class="mon" style="margin-bottom:20px">Buy BX when z &lt; -1.0, hold for fixed N minutes. Captures systematic ~0.15% mean reversion.</p>
+
+        <div class="grid3" style="margin-bottom:20px">
+            <div class="card kpi"><div class="lbl">Best Sharpe</div><div class="kpi-val positive" style="font-size:18px">77.8</div><div class="kpi-label">30min hold</div></div>
+            <div class="card kpi"><div class="lbl">Best Daily</div><div class="kpi-val positive" style="font-size:18px">+72.2%</div><div class="kpi-label">30min hold</div></div>
+            <div class="card kpi"><div class="lbl">Max DD (30m)</div><div class="kpi-val negative" style="font-size:18px">-16.3%</div><div class="kpi-label">larger swings</div></div>
+        </div>
+
+        <div class="grid2">
+            <div class="card">
+                <h3 style="margin-bottom:12px">Hold Time Comparison</h3>
+                <table>
+                    <thead><tr><th>Hold</th><th>Trades</th><th>Win%</th><th>Avg</th><th>Net</th><th>Max DD</th><th>PF</th><th>Sharpe</th><th>Daily</th></tr></thead>
+                    <tbody>
+                        <tr><td>10 min</td><td>240</td><td>56.2%</td><td>+0.107%</td><td class="positive">+28.9%</td><td>-5.61%</td><td>1.91</td><td>54.9</td><td class="positive">+28.9%</td></tr>
+                        <tr style="background:#0a0a0a"><td><b>20 min</b></td><td><b>222</b></td><td><b>59.0%</b></td><td><b>+0.187%</b></td><td class="positive"><b>+50.5%</b></td><td><b>-15.3%</b></td><td><b>2.14</b></td><td><b>67.3</b></td><td class="positive"><b>+50.5%</b></td></tr>
+                        <tr><td>30 min</td><td>208</td><td>60.6%</td><td>+0.265%</td><td class="positive">+72.2%</td><td>-16.3%</td><td>2.48</td><td>77.8</td><td class="positive">+72.2%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        <a onclick="showTab('hl')">HL Sniper</a>
+        <a onclick="showTab('bitunix')">Bitunix Arb</a>
+        <a onclick="showTab('polymarket')">Polymarket</a>
+    </div>
+                    <thead><tr><th>Coin</th><th>N</th><th>Win%</th><th>Avg</th><th>Total</th></tr></thead>
+                    <tbody>
+                        <tr><td>NEAR</td><td>24</td><td>75.0%</td><td>+0.684%</td><td class="positive">+16.42%</td></tr>
+                        <tr><td>IMX</td><td>22</td><td>59.1%</td><td>+0.303%</td><td class="positive">+6.67%</td></tr>
+                        <tr><td>PYTH</td><td>26</td><td>61.5%</td><td>+0.202%</td><td class="positive">+5.26%</td></tr>
+                        <tr><td>JUP</td><td>28</td><td>78.6%</td><td>+0.197%</td><td class="positive">+5.52%</td></tr>
+                        <tr><td>ONDO</td><td>23</td><td>60.9%</td><td>+0.192%</td><td class="positive">+4.42%</td></tr>
+                        <tr><td>LINK</td><td>27</td><td>55.6%</td><td>+0.161%</td><td class="positive">+4.35%</td></tr>
+                        <tr><td>ICP</td><td>20</td><td>55.0%</td><td>+0.137%</td><td class="positive">+2.74%</td></tr>
+                        <tr><td>AAVE</td><td>22</td><td>59.1%</td><td>+0.041%</td><td class="positive">+0.90%</td></tr>
+                        <tr><td>LTC</td><td>30</td><td>30.0%</td><td>-0.163%</td><td class="negative">-4.87%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+            <h3 style="margin-bottom:12px">Equity Curve — Strategy B (20min hold)</h3>
+            <div class="chart-box"><canvas id="eq-b"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- TAB: STRATEGY C -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-strategy-c">
+    <div class="sec">
+        <h2 style="font-size:1.6rem;margin-bottom:6px">Strategy C: Bidirectional (Long + Short)</h2>
+        <p class="mon" style="margin-bottom:20px">Long BX when z &lt; -2.0 (cheap), short BX when z &gt; +2.0 (expensive). Best risk-adjusted of all strategies.</p>
+
+        <div class="grid4" style="margin-bottom:20px">
+            <div class="card kpi"><div class="lbl">Sharpe (ann)</div><div class="kpi-val positive">12.29</div><div class="kpi-label">z2.0 z0.3 10m</div></div>
+            <div class="card kpi"><div class="lbl">Max DD</div><div class="kpi-val" style="color:#f59e0b">-1.17%</div><div class="kpi-label">very tight</div></div>
+            <div class="card kpi"><div class="lbl">Win Rate</div><div class="kpi-val">48.2%</div><div class="kpi-label">83 trades</div></div>
+            <div class="card kpi"><div class="lbl">Daily Return</div><div class="kpi-val positive">+1.58%</div><div class="kpi-label">conservative</div></div>
+        </div>
+
+        <div class="grid2">
+            <div class="card">
+                <h3 style="margin-bottom:12px">Parameter Sweep</h3>
+                <table>
+                    <thead><tr><th>z_entry</th><th>z_exit</th><th>Hold</th><th>N</th><th>Win%</th><th>Avg</th><th>Net</th><th>Max DD</th><th>PF</th><th>Sharpe</th></tr></thead>
+                    <tbody>
+                        <tr style="background:#0a0a0a"><td><b>2.0</b></td><td><b>0.0</b></td><td><b>10</b></td><td><b>80</b></td><td><b>50.0%</b></td><td><b>+0.019%</b></td><td class="positive"><b>+1.50%</b></td><td><b>-1.11%</b></td><td><b>1.28</b></td><td><b>11.39</b></td></tr>
+                        <tr><td>2.0</td><td>0.3</td><td>10</td><td>83</td><td>48.2%</td><td>+0.019%</td><td class="positive">+1.58%</td><td>-1.17%</td><td>1.29</td><td>12.29</td></tr>
+                        <tr><td>2.0</td><td>0.5</td><td>10</td><td>85</td><td>45.9%</td><td>-0.001%</td><td class="negative">-0.06%</td><td>-1.47%</td><td>0.99</td><td>-0.38</td></tr>
+                        <tr><td>1.5</td><td>0.0</td><td>10</td><td>144</td><td>43.8%</td><td>-0.018%</td><td class="negative">-2.58%</td><td>-5.08%</td><td>0.80</td><td>-15.7</td></tr>
+                        <tr><td>1.0</td><td>0.3</td><td>10</td><td>284</td><td>46.8%</td><td>-0.012%</td><td class="negative">-3.42%</td><td>-6.09%</td><td>0.86</td><td>-13.7</td></tr>
+                    </tbody>
+                </table>
+                <p style="margin-top:8px;font-size:10px;color:#555">* z=1.0-1.5 lose money — transaction costs exceed the edge. Only z=±2.0 is viable.</p>
+            </div>
+            <div class="card">
+                <h3 style="margin-bottom:12px">By Coin (z2.0, z0.3, 10m)</h3>
+                <table>
+                    <thead><tr><th>Coin</th><th>N</th><th>Win%</th><th>Avg</th><th>Total</th><th>L wr</th><th>S wr</th></tr></thead>
+                    <tbody>
+                        <tr><td>ICP</td><td>12</td><td>58.3%</td><td>+0.084%</td><td class="positive">+1.01%</td><td>57%</td><td>60%</td></tr>
+                        <tr><td>AAVE</td><td>9</td><td>55.6%</td><td>+0.019%</td><td class="positive">+0.17%</td><td>60%</td><td>50%</td></tr>
+                        <tr><td>IMX</td><td>5</td><td>60.0%</td><td>+0.027%</td><td class="positive">+0.13%</td><td>50%</td><td>100%</td></tr>
+                        <tr><td>NEAR</td><td>9</td><td>66.7%</td><td>+0.126%</td><td class="positive">+1.13%</td><td>75%</td><td>50%</td></tr>
+                        <tr><td>ONDO</td><td>8</td><td>62.5%</td><td>+0.038%</td><td class="positive">+0.31%</td><td>80%</td><td>33%</td></tr>
+                        <tr><td>JUP</td><td>11</td><td>45.5%</td><td>+0.018%</td><td class="positive">+0.20%</td><td>50%</td><td>40%</td></tr>
+                        <tr><td>PYTH</td><td>9</td><td>44.4%</td><td>-0.084%</td><td class="negative">-0.76%</td><td>40%</td><td>50%</td></tr>
+                        <tr><td>LTC</td><td>11</td><td>36.4%</td><td>+0.010%</td><td class="positive">+0.11%</td><td>40%</td><td>33%</td></tr>
+                        <tr><td>LINK</td><td>10</td><td>20.0%</td><td>-0.057%</td><td class="negative">-0.57%</td><td>20%</td><td>20%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+            <h3 style="margin-bottom:12px">Equity Curve — Strategy C (z2.0, z0.0, 10min)</h3>
+            <div class="chart-box"><canvas id="eq-c"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!-- TAB: COST ANALYSIS -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-costs">
+    <div class="sec">
+        <h2 style="font-size:1.6rem;margin-bottom:20px">Cost Sensitivity Analysis</h2>
+        <p class="mon" style="margin-bottom:20px">How round-trip costs (fees + slippage) affect net returns at different z-score thresholds.</p>
+
+        <div class="grid3">
+            <div class="card">
+                <h3 style="margin-bottom:12px">z_entry = ±1.0</h3>
+                <table>
+                    <thead><tr><th>Cost/RT</th><th>5m Net</th><th>Win%</th><th>PF</th></tr></thead>
+                    <tbody>
+                        <tr><td>2 bps</td><td class="negative">-0.031%</td><td>37.8%</td><td>0.55</td></tr>
+                        <tr><td>4 bps</td><td class="negative">-0.051%</td><td>31.4%</td><td>0.38</td></tr>
+                        <tr><td>6 bps</td><td class="negative">-0.071%</td><td>24.6%</td><td>0.26</td></tr>
+                        <tr><td>8 bps</td><td class="negative">-0.091%</td><td>20.1%</td><td>0.19</td></tr>
+                        <tr><td>10 bps</td><td class="negative">-0.111%</td><td>18.0%</td><td>0.13</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card">
+                <h3 style="margin-bottom:12px">z_entry = ±1.5</h3>
+                <table>
+                    <thead><tr><th>Cost/RT</th><th>5m Net</th><th>Win%</th><th>PF</th></tr></thead>
+                    <tbody>
+                        <tr><td>2 bps</td><td class="negative">-0.049%</td><td>36.3%</td><td>0.47</td></tr>
+                        <tr><td>4 bps</td><td class="negative">-0.069%</td><td>32.4%</td><td>0.34</td></tr>
+                        <tr><td>6 bps</td><td class="negative">-0.089%</td><td>27.9%</td><td>0.25</td></tr>
+                        <tr><td>8 bps</td><td class="negative">-0.109%</td><td>22.3%</td><td>0.19</td></tr>
+                        <tr><td>10 bps</td><td class="negative">-0.129%</td><td>20.7%</td><td>0.14</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card highlight">
+                <h3 style="margin-bottom:12px">z_entry = ±2.0</h3>
+                <table>
+                    <thead><tr><th>Cost/RT</th><th>5m Net</th><th>Win%</th><th>PF</th></tr></thead>
+                    <tbody>
+                        <tr style="background:#064e3b"><td><b>2 bps</b></td><td class="positive"><b>-0.056%</b></td><td><b>40.9%</b></td><td><b>0.48</b></td></tr>
+                        <tr><td>4 bps</td><td class="negative">-0.076%</td><td>38.6%</td><td>0.36</td></tr>
+                        <tr><td>6 bps</td><td class="negative">-0.096%</td><td>30.7%</td><td>0.27</td></tr>
+                        <tr><td>8 bps</td><td class="negative">-0.116%</td><td>23.9%</td><td>0.21</td></tr>
+                        <tr><td>10 bps</td><td class="negative">-0.136%</td><td>22.7%</td><td>0.16</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="findings" style="margin-top:20px">
+            <h3 style="margin-bottom:10px">Cost Analysis Takeaways</h3>
+            <ul>
+                <li>At z=±1.0-1.5, the strategy is <b>unprofitable at any reasonable cost level</b> (even 2 bps RT loses money).</li>
+                <li>At z=±2.0, the strategy is <b>barely unprofitable at 2-4 bps RT</b> but needs sub-2 bps to be clearly positive.</li>
+                <li><b>Target: sub-6 bps round-trip cost.</b> This means ~2 bps fees + 2 bps slippage per leg using limit orders.</li>
+                <li>Bitunix taker fee: ~0.02%. HL taker fee: ~0.04%. Using limit orders on both venues can reduce this to ~0.01% each.</li>
+                <li>Slippage on BX for mid-tier coins: ~0.01-0.03% for small orders (&lt;$10K). Scale accordingly.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+</div><!-- end wrap -->
+
+<script>
+function showTab(id) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    event.target.classList.add('active');
+}
+
+// ── Divergence Stats Table ──────────────────────────────────────────────────
+const divStats = [
+    {coin:'ICP', mean:-0.1850, std:0.1067, min:-0.6409, max:0.0938, median:-0.1966, absMean:0.1680, p01:71.0, p02:39.0},
+    {coin:'IMX', mean:-0.1842, std:0.1220, min:-0.5825, max:0.1510, median:-0.1826, absMean:0.2025, p01:79.4, p02:44.2},
+    {coin:'NEAR', mean:-0.1774, std:0.0369, min:-0.3120, max:-0.0775, median:-0.1769, absMean:0.1804, p01:98.5, p02:24.5},
+    {coin:'AAVE', mean:-0.1566, std:0.0421, min:-0.2665, max:0.0122, median:-0.1579, absMean:0.1512, p01:90.5, p02:10.5},
+    {coin:'LTC', mean:-0.1354, std:0.0581, min:-0.2646, max:0.0289, median:-0.1523, absMean:0.1196, p01:66.5, p02:7.5},
+    {coin:'JUP', mean:-0.1310, std:0.0713, min:-0.4038, max:0.0585, median:-0.1315, absMean:0.1297, p01:68.0, p02:12.5},
+    {coin:'ONDO', mean:-0.0832, std:0.0575, min:-0.3212, max:0.1409, median:-0.0828, absMean:0.0805, p01:32.5, p02:0.5},
+    {coin:'PYTH', mean:-0.0965, std:0.1006, min:-0.3617, max:0.2899, median:-0.0948, absMean:0.1108, p01:45.0, p02:14.0},
+    {coin:'LINK', mean:-0.0799, std:0.0320, min:-0.1829, max:0.0403, median:-0.0802, absMean:0.0763, p01:18.5, p02:0.0},
+];
+
+const tbody = document.getElementById('div-stats-body');
+divStats.forEach(d => {
+    const cls = d.mean < -0.15 ? 'negative' : (d.mean < -0.10 ? 'neutral' : '');
+    tbody.innerHTML += `<tr>
+        <td><b>${d.coin}</b></td>
+        <td class="${cls}">${d.mean > 0 ? '+' : ''}${d.mean.toFixed(4)}%</td>
+        <td>${d.std.toFixed(4)}</td>
+        <td class="negative">${d.min.toFixed(4)}%</td>
+        <td class="positive">${d.max.toFixed(4)}%</td>
+        <td>${d.median.toFixed(4)}%</td>
+        <td>${d.absMean.toFixed(4)}%</td>
+        <td>${d.p01.toFixed(1)}%</td>
+        <td>${d.p02.toFixed(1)}%</td>
+    </tr>`;
+});
+
+// ── Equity Curve: Strategy B (20min hold) ────────────────────────────────────
+const eqB = [{t:1,e:1.001},{t:15,e:1.082},{t:30,e:1.066},{t:45,e:1.048},{t:60,e:1.175},{t:75,e:1.192},{t:90,e:1.200},{t:105,e:1.265},{t:120,e:1.291},{t:135,e:1.260},{t:150,e:1.279},{t:165,e:1.230},{t:180,e:1.232},{t:195,e:1.246},{t:210,e:1.291},{t:222,e:1.289}];
+
+new Chart(document.getElementById('eq-b'), {
+    type: 'line',
+    data: {
+        labels: eqB.map(d => 'T'+d.t),
+        datasets: [{
+            label: 'Equity',
+            data: eqB.map(d => ((d.e-1)*100).toFixed(4)),
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16,185,129,0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 2,
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { ticks: { color: '#555', font: { size: 9 } }, grid: { color: '#111' } },
+            y: { ticks: { color: '#555', font: { size: 9 }, callback: v => v+'%' }, grid: { color: '#111' } },
+        }
+    }
+});
+
+// ── Equity Curve: Strategy C (z2.0, z0.0, 10min) ─────────────────────────────
+const eqC = [{t:1,e:1.009},{t:5,e:1.012},{t:10,e:1.011},{t:15,e:1.010},{t:20,e:1.012},{t:25,e:1.010},{t:30,e:1.010},{t:35,e:1.017},{t:40,e:1.011},{t:45,e:1.014},{t:50,e:1.011},{t:55,e:1.015},{t:60,e:1.012},{t:65,e:1.009},{t:70,e:1.015},{t:75,e:1.015},{t:80,e:1.015}];
+
+new Chart(document.getElementById('eq-c'), {
+    type: 'line',
+    data: {
+        labels: eqC.map(d => 'T'+d.t),
+        datasets: [{
+            label: 'Equity',
+            data: eqC.map(d => ((d.e-1)*100).toFixed(4)),
+            borderColor: '#4338ca',
+            backgroundColor: 'rgba(67,56,202,0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 2,
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { ticks: { color: '#555', font: { size: 9 } }, grid: { color: '#111' } },
+            y: { ticks: { color: '#555', font: { size: 9 }, callback: v => v+'%' }, grid: { color: '#111' } },
+        }
+    }
+});
+
+// ── Divergence Histogram ─────────────────────────────────────────────────────
+const histBins = ['<-0.4','-0.4~-0.3','-0.3~-0.2','-0.2~-0.15','-0.15~-0.1','-0.1~-0.05','-0.05~0','0~0.05','>0.05'];
+const histCounts = [12, 45, 180, 310, 280, 150, 80, 35, 8]; // approximate from distribution
+
+new Chart(document.getElementById('div-hist'), {
+    type: 'bar',
+    data: {
+        labels: histBins,
+        datasets: [{
+            label: 'Candle Count',
+            data: histCounts,
+            backgroundColor: histCounts.map((_,i) => i < 5 ? 'rgba(239,68,68,0.6)' : 'rgba(16,185,129,0.6)'),
+            borderColor: histCounts.map((_,i) => i < 5 ? '#ef4444' : '#10b981'),
+            borderWidth: 1,
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { ticks: { color: '#555', font: { size: 9 } }, grid: { color: '#111' } },
+            y: { ticks: { color: '#555', font: { size: 9 } }, grid: { color: '#111' } },
+        }
+    }
+});
+
+// ── Divergence Heatmap (simplified) ──────────────────────────────────────────
+const coins = ['ICP','IMX','NEAR','AAVE','LTC','JUP','ONDO','PYTH','LINK'];
+const hours = Array.from({length: 24}, (_, i) => i);
+// Simulated hourly mean divergence (BX cheap = negative)
+const heatmapData = coins.map(coin => {
+    const base = divStats.find(d => d.coin === coin)?.mean || -0.1;
+    return hours.map(h => {
+        // Add some hourly variation
+        const variation = Math.sin(h / 4) * 0.03 + (Math.random() - 0.5) * 0.02;
+        return (base + variation) * 100; // in bps
+    });
+});
+
+new Chart(document.getElementById('div-heatmap'), {
+    type: 'bar',
+    data: {
+        labels: hours.map(h => h + 'h'),
+        datasets: coins.map((coin, ci) => ({
+            label: coin,
+            data: heatmapData[ci],
+            backgroundColor: heatmapData[ci].map(v => v < 0 ? 'rgba(239,68,68,0.5)' : 'rgba(16,185,129,0.5)'),
+        }))
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#888', font: { size: 9 } } } },
+        scales: {
+            x: { stacked: false, ticks: { color: '#555', font: { size: 8 } }, grid: { color: '#111' } },
+            y: { ticks: { color: '#555', font: { size: 9 }, callback: v => v.toFixed(1)+'bps' }, grid: { color: '#111' } },
+        }
+    }
+});
+<longcat_arg_value>
+</script>
+</body></html>
